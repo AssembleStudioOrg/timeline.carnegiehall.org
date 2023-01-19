@@ -10,6 +10,7 @@ export type Item = {
   key: string;
   title: string;
   color?: string;
+  secondary_color?: string;
 };
 
 export type Filters = {

@@ -54,13 +54,15 @@ export function computeStats(data: Genre[]) {
   const musical_features = new Set();
   const instruments = new Set();
   const traditions = new Set();
+  const colors = new Map();
 
   data.map((d) => {
     d.themes.map((t) => themes.add(t.title));
     d.musical_features.map((t) => musical_features.add(t.title));
     d.instruments.map((t) => instruments.add(t.title));
     traditions.add(d.tradition.title);
+    colors.set(d.tradition.title, d.tradition.secondary_color!);
   });
 
-  return { themes, musical_features, instruments, traditions };
+  return { themes, musical_features, instruments, traditions, colors };
 }

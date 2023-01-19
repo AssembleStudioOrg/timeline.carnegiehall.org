@@ -11,15 +11,18 @@ export type OverflowScrollProps = {
   disabled?: boolean;
   fullwidth?: boolean;
   containerClasses?: string;
+  navOffset?: number;
 } & HTMLProps<HTMLDivElement>;
 
 function Nav({
   direction,
   hidden,
+  offset = 0,
   ...props
 }: {
   direction: 'previous' | 'next';
   hidden: boolean;
+  offset?: number;
 } & HTMLProps<HTMLDivElement>) {
   return (
     <div
@@ -33,6 +36,7 @@ function Nav({
       {...props}
     >
       <div
+        style={offset ? { marginTop: `${offset}px` } : {}}
         className={`inline-flex items-center justify-center rounded-full w-7 h-7 border border-grey-100 group-hover:bg-grey-100 ${
           direction === 'previous' ? 'rotate-180 ml-6' : 'mr-6'
         }`}
@@ -53,6 +57,7 @@ export function OverflowScroll({
   withNav,
   fullwidth,
   children,
+  navOffset,
   className = '',
   containerClasses = ''
 }: OverflowScrollProps) {
@@ -72,7 +77,7 @@ export function OverflowScroll({
           `[${INTERSECTION_PROP}="false"]`
         )
       ),
-      previousItem = hiddenItems
+      previousItem = [...hiddenItems]
         .reverse()
         .find((item) => (item as any).getBoundingClientRect().x < 0),
       nextItem = hiddenItems.find(
@@ -99,7 +104,7 @@ export function OverflowScroll({
     let alignment = 'end';
 
     if (item === 'next') {
-      alignment = 'start';
+      alignment = 'end';
     } else {
       alignment = items.indexOf(target) <= 0 ? 'center' : 'end';
     }
@@ -136,6 +141,7 @@ export function OverflowScroll({
         <Nav
           hidden={!withNav || !hasItems.previous}
           direction="previous"
+          offset={navOffset}
           onClick={() => goTo('previous')}
         />
         <PageGrid ref={scrollRef} className={`${!disabled && 'scrollable'}`}>
@@ -165,6 +171,7 @@ export function OverflowScroll({
         </PageGrid>
         <Nav
           hidden={!withNav || !hasItems.next}
+          offset={navOffset}
           direction="next"
           onClick={() => goTo('next')}
         />

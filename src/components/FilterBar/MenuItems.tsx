@@ -57,7 +57,7 @@ const MenuItems = ({ mainMenu, setMainMenu, stats }: any) => {
           role="menuitem"
           onClick={select(item)}
         >
-          <span className="flex justify-between">
+          <span className="flex items-center justify-between">
             <span>{item}</span>
             {!mainMenu && (
               <CaretIcon className="h-3 fill-current text-grey-700" />

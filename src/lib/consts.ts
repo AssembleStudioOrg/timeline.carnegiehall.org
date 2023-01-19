@@ -30,6 +30,7 @@ export const GRID_GAP: number = 80;
 export const STROKE_DASH_ARRAY: number = 1;
 export const LINK_TRIANGLE_SIZE: number = 7;
 export const YEAR_RANGE_KEY: string = 'yearRange';
+export const SHOW_CROSS_LINK_KEY: string = 'showCrossLinks';
 
 export const DIRECT_LINK_KEYS = {
   source: 'influenced',

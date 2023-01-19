@@ -29,6 +29,7 @@ type Params = {
   height: number;
   filters?: Filters;
   isMobile: boolean;
+  showCrossLinks: boolean;
 };
 
 export const isDirectLink = (link: Link) =>
@@ -212,16 +213,15 @@ function computeLinks(nodes: Node[]) {
   return links;
 }
 
-function computeLinksPosition(nodes: Node[], links: Link[]) {
+function computeLinksPosition(nodes: Node[], links: Link[], showCrossLinks: boolean) {
   const nodesMap = new Map(nodes.map((node) => [node.id, node]));
 
   map(links, (l) => {
     const { source: sourceNodeId, target: targetNodeId } = l;
     const s = nodesMap.get(sourceNodeId); // source node
     const t = nodesMap.get(targetNodeId); // target node
-    // console.log(l, s, t)
 
-    if (isDirectLink(l)) {
+    if (isDirectLink(l) && s && t) {
       const controlNodeYAxis = (t!._y1 + s!._y0) / 2;
 
       /**
@@ -242,7 +242,7 @@ function computeLinksPosition(nodes: Node[], links: Link[]) {
       l.strokeWidth = s?._width;
     }
 
-    if (isCrossLink(l)) {
+    if (showCrossLinks && isCrossLink(l) && s && t) {
       const controlNode = {
         x: (s!._xMidPoint + t!._xMidPoint) / 2,
         y: t?._yMidPoint
@@ -294,7 +294,7 @@ function computeLinksPosition(nodes: Node[], links: Link[]) {
 }
 
 export function transformToGraph(params: Params) {
-  const { data, maxYear, filters } = params;
+  const { data, maxYear, filters, showCrossLinks } = params;
 
   // data quality check
   if (!data || !data.length) {
@@ -318,7 +318,7 @@ export function transformToGraph(params: Params) {
 
   // compute links
   let links = computeLinks(nodes);
-  links = computeLinksPosition(nodes, links);
+  links = computeLinksPosition(nodes, links, showCrossLinks);
 
   return { nodes, links };
 }

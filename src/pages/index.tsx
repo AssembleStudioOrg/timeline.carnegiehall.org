@@ -11,9 +11,10 @@ import { ScrollProgress } from '$src/components/ScrollProgress';
 import { ShareBar } from '$src/components/ShareBar';
 import { SwipeCarousel, SwipeIndicator } from '$src/components/SwipeCarousel';
 import { Article, ARTICLE_CONTAINER_STYLES } from '$src/containers/Article';
-import { BREAKPOINTS, CMS_API } from '$src/lib/consts';
+import { cms } from '$src/lib/cms';
+import { BREAKPOINTS } from '$src/lib/consts';
 import { useBreakpoint } from '$src/lib/hooks';
-import { fetchJSON, onKeyAction, paginatedFetchJSON } from '$src/lib/utils';
+import { onKeyAction } from '$src/lib/utils';
 import { usePlayer } from '$src/stores/usePlayer';
 import { parseSong, useSong } from '$src/stores/useSong';
 import type { GetStaticProps } from 'next';
@@ -109,11 +110,7 @@ export default function HomePage({ stories, allStories }: any) {
         }
       `}</style>
 
-      <Meta
-        title={story?.seo.title}
-        description={story?.seo.description}
-        cover={story?.seo.image}
-      />
+      <Meta {...story?.seo} />
 
       <Head>
         {stories.map(({ id, hero_image }: any) => (
@@ -236,23 +233,16 @@ export default function HomePage({ stories, allStories }: any) {
 }
 
 /** Page data */
-export const getStaticProps: GetStaticProps = async () => {
-  const { featured_stories } = await fetchJSON(`${CMS_API}/site-settings`),
-    { data: stories } = await paginatedFetchJSON(`${CMS_API}/stories`);
+export const getStaticProps: GetStaticProps = async ({ preview }) => {
+  const [settings, stories] = await Promise.all([
+    cms(`site-settings`),
+    cms(`v2/stories`, { preview })
+  ]);
 
   return {
     props: {
-      stories: featured_stories.data,
-      allStories: stories.map(
-        ({ id, slug, position, title, hero_image, authors }: any) => ({
-          id,
-          slug,
-          position,
-          title,
-          hero_image,
-          authors
-        })
-      )
+      stories: settings.featured_stories.data,
+      allStories: stories.data
     }
   };
 };

@@ -1,4 +1,5 @@
 import { ReactComponent as CrossIcon } from '$src/assets/icons/cross.svg';
+import { YEAR_RANGE_KEY } from '$src/lib/consts';
 import { useTimeline } from '$src/stores/useTimeline';
 import { useCallback } from 'react';
 import shallow from 'zustand/shallow';
@@ -15,12 +16,12 @@ const FilterItems = () => {
   // clear filter when clicking them
   const clearFilter = (filter: string) => () => {
     const newFilters = Object.assign({}, filters);
-    if (filter == 'yearRange') {
+    if (filter == YEAR_RANGE_KEY) {
       delete newFilters.yearRange;
     }
 
     Object.keys(newFilters).map((k) => {
-      if (k === 'yearRange') return;
+      if (k === YEAR_RANGE_KEY) return;
       (newFilters as any)[k].delete(filter);
     });
 

@@ -42,6 +42,7 @@ export function Img({
   alt,
   width,
   height,
+  style,
   responsive = true,
   imgixParams = { auto: 'format' },
   ...props
@@ -54,11 +55,28 @@ export function Img({
   }, []);
 
   if (!/^https?:/.test(src) || !responsive) {
-    return <img src={src} alt={alt} {...props} />;
+    return (
+      <img
+        style={{
+          textIndent: '100%',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden'
+        }}
+        src={src}
+        alt={alt}
+        {...props}
+      />
+    );
   }
 
   return (
     <img
+      style={{
+        ...style,
+        textIndent: '100%',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden'
+      }}
       src={ready ? src : placeholder}
       srcSet={ready ? srcset(src, imgixParams) : ''}
       alt={alt}

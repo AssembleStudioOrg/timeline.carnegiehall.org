@@ -6,13 +6,7 @@ import { SITE_URL } from '$src/lib/consts';
 /**
  * Link wrapper
  */
-export function Link({
-  href = '',
-  as,
-  shallow,
-  children,
-  ...props
-}: LinkProps & any) {
+export function Link({ href = '', children, ...props }: LinkProps & any) {
   const [external, setExternal] = useState(false);
 
   useEffect(() => {
@@ -22,13 +16,12 @@ export function Link({
   }, [href]);
 
   return (
-    <NextLink {...{ href, as, shallow }}>
-      <a
-        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        {...props}
-      >
-        {children}
-      </a>
+    <NextLink
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      {...props}
+    >
+      {children}
     </NextLink>
   );
 }

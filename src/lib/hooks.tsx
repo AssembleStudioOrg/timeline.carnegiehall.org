@@ -1,23 +1,5 @@
-import { usePageLayout } from '$src/stores/useLayout';
 import { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { useWindowScroll } from 'react-use';
-import useSWR from 'swr';
-
-/**
- * Simple data fetcher using SWR
- */
-export function useData(url: string) {
-  const fetcher = (input: RequestInfo, init: RequestInit, ...args: any[]) =>
-      fetch(input, init).then((res) => res.json()),
-    { data, error } = useSWR(url, fetcher);
-
-  return {
-    data,
-    error,
-    loading: !error && !data
-  };
-}
 
 /**
  * Patched useMediaQuery for SSR

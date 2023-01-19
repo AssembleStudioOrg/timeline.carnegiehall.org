@@ -1,29 +1,27 @@
 import type { KeyboardEvent } from 'react';
+class HTTPError extends Error {}
 
 /**
- * Simple fetch wrapper for JSON GETs
+ * Fetch with HTTP errors and retries
  */
-export async function fetchJSON(url: string) {
-  const data = await fetch(url).then((res) => res.json());
-  return JSON.parse(JSON.stringify(data));
-}
+export async function httpfetch(
+  url: string,
+  opts?: any,
+  retries = 3
+): Promise<any> {
+  const res = await fetch(url, opts);
 
-/**
- * Simple fetch wrapper for JSON GETs w/ looping for paginated cases
- */
-export async function paginatedFetchJSON(url: string) {
-  let records: any = [];
-  let hasNextPage: boolean = false;
-  let fetchUrl: string = url;
+  if (res.ok) {
+    return res;
+  }
 
-  do {
-    let response = await fetch(fetchUrl).then((res) => res.json());
-    records = records.concat(response.data);
-    hasNextPage = response.next ?? false;
-    if (hasNextPage) fetchUrl = response.next;
-  } while (hasNextPage);
+  if (retries > 0) {
+    return httpfetch(url, opts, retries - 1);
+  }
 
-  return { data: records };
+  const error = new HTTPError(`Fetch error: ${res.statusText}`);
+  error.code = res.status;
+  throw error;
 }
 
 /**

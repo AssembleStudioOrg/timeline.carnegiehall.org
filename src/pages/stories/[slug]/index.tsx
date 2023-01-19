@@ -7,11 +7,12 @@ import { ScrollDown } from '$src/components/ScrollDown';
 import { ScrollProgress } from '$src/components/ScrollProgress';
 import { ShareBar } from '$src/components/ShareBar';
 import { Article, ARTICLE_CONTAINER_STYLES } from '$src/containers/Article';
-import { CMS_API } from '$src/lib/consts';
-import { paginatedFetchJSON } from '$src/lib/utils';
+import { cms } from '$src/lib/cms';
+import { useExplorations } from '$src/stores/useExplorations';
 import { usePlayer } from '$src/stores/usePlayer';
 import { parseSong, useSong } from '$src/stores/useSong';
 import type { GetStaticPaths, GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 
 /**
@@ -19,24 +20,28 @@ import { useCallback, useEffect } from 'react';
  */
 export default function StoryPage({ data, stories }: any) {
   const setSong = useSong(useCallback((s) => s.set, [])),
-    songPlaying = usePlayer(useCallback((s) => s.playing, []));
+    songPlaying = usePlayer(useCallback((s) => s.playing, [])),
+    addExploration = useExplorations((s) => s.add),
+    router = useRouter();
 
   useEffect(() => {
     if (!!data.default_song && !songPlaying) {
       setSong(parseSong(data.default_song));
     }
-  }, [data, setSong]);
+
+    addExploration({
+      title: data.title,
+      href: router.asPath,
+      type: 'Story'
+    });
+  }, [data, setSong, router, addExploration]);
 
   return (
     <>
       <ScrollProgress />
       <AdaptiveHeader />
 
-      <Meta
-        title={data.seo.title}
-        description={data.seo.description}
-        cover={data.seo.image}
-      />
+      <Meta {...data.seo} />
       <div className="!col-span-full sticky top-0 ">
         <HeroImg
           image={data.hero_image}
@@ -68,30 +73,23 @@ export default function StoryPage({ data, stories }: any) {
 }
 
 /** Page data */
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const { data: stories } = await paginatedFetchJSON(`${CMS_API}/stories`),
-    data = stories.find(({ slug }: any) => slug === params?.slug);
+export const getStaticProps: GetStaticProps = async ({ params, preview }) => {
+  const [data, stories] = await Promise.all([
+    cms(`v2/stories/${params?.slug}`, { preview }),
+    cms(`v2/stories`, { preview })
+  ]);
 
   return {
     props: {
       data,
-      stories: stories.map(
-        ({ id, slug, position, title, hero_image, authors, color }: any) => ({
-          id,
-          slug,
-          position,
-          title,
-          hero_image,
-          authors
-        })
-      )
+      stories: stories.data
     }
   };
 };
 
 /** Static pages generation */
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: stories } = await paginatedFetchJSON(`${CMS_API}/stories`);
+  const { data: stories } = await cms(`v2/stories`);
 
   return {
     paths: stories.map(({ slug, id }: any) => ({

@@ -1,11 +1,10 @@
-import { ReactComponent as PlayIcon } from '$src/assets/icons/play-solid.svg';
 import { ReactComponent as PauseIcon } from '$src/assets/icons/pause-solid.svg';
+import { ReactComponent as PlayIcon } from '$src/assets/icons/play-solid.svg';
+import { usePlayer } from '$src/stores/usePlayer';
 import { SongConfig, useSong } from '$src/stores/useSong';
 import { HTMLProps, useCallback } from 'react';
-import { Img } from '../Img';
 import shallow from 'zustand/shallow';
-import { usePlayer } from '$src/stores/usePlayer';
-import { AlbumCover } from '../AlbumCover';
+import { Img } from '../Img';
 
 export type SongProps = {
   /** Visual theme of the song */
@@ -16,6 +15,8 @@ export type SongProps = {
   label?: string | any;
   /** Optional highlight color on hover */
   highlight?: string;
+  /** Whether to show  the cover */
+  cover?: boolean;
 } & HTMLProps<HTMLDivElement>;
 
 /**
@@ -26,6 +27,7 @@ export function Song({
   song,
   label,
   highlight,
+  cover = true,
   className = ''
 }: SongProps) {
   const [currentSong, setSong] = useSong(
@@ -43,12 +45,10 @@ export function Song({
         ? `<${label.type}>${label.props.children}<${label.type}>`
         : label;
 
-  function play() {
-    setPlayer({ playing: false });
-    setTimeout(() => {
-      setSong(song);
-      setPlayer({ playing: true });
-    }, 0);
+  async function play() {
+    (setPlayer as any)({ playing: false });
+    setTimeout(() => (setSong as any)(song), 1);
+    setTimeout(() => (setPlayer as any)({ playing: true }), 1);
   }
 
   switch (theme) {
@@ -64,13 +64,25 @@ export function Song({
             className={`song cursor-pointer transition-colors group flex ${className}`}
             onClick={play}
           >
-            <div className={`relative h-[48px] w-[48px] mr-4`}>
-              <div
-                className={`absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-20 transition-opacity z-10`}
-                style={{ background: highlight }}
-              />
-              <AlbumCover song={song} />
-            </div>
+            {cover && (
+              <div className={`relative h-[48px] w-[48px] mr-4`}>
+                <div
+                  className={`absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-20 transition-opacity z-10`}
+                  style={{ background: highlight }}
+                />
+                <Img
+                  src={song.cover || ''}
+                  responsive={!!song?.cover}
+                  alt={song?.artist || 'Album cover'}
+                  title={song?.attribution || ''}
+                  sizes="48px"
+                  width={128}
+                  height={128}
+                  className="object-cover w-full h-full"
+                  style={{ filter: 'grayscale(1)' }}
+                />
+              </div>
+            )}
             <div>
               <span
                 className="block font-bold font-display"
@@ -78,7 +90,7 @@ export function Song({
                   __html: parsedLabel || song?.title || ''
                 }}
               />
-              <div className="text-sm font-ui">{song?.artist}</div>
+              <div className="text-sm text-white font-ui">{song?.artist}</div>
             </div>
           </div>
         </>
@@ -89,7 +101,7 @@ export function Song({
           className={`inline overflow-visible cursor-pointer text-red ${className}`}
           onClick={() => {
             if (songPlaying) {
-              setPlayer({ playing: false });
+              (setPlayer as any)({ playing: false });
             } else {
               play();
             }

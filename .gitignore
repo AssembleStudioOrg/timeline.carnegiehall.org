@@ -7,12 +7,13 @@ node_modules
 *.log*
 
 # Build
-/build
+/build 
 /storybook
+.turbo
 /out
 /public/sw.js
 /public/workbox*
-/public/sitemap.xml
+/public/sitemap*
 /public/robots.txt
 
 # Misc

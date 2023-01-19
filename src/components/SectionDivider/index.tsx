@@ -3,6 +3,7 @@ import type { HTMLProps } from 'react';
 const Line = ({ length }: { length: BarLength }) => {
   const lengths = {
     standard: 'h-[64px] sm:h-[100px]',
+    'extra-short': 'h-[28px] sm:h-[48px]',
     short: 'h-[28px] sm:h-[96px]',
     long: 'h-[180px] sm:h-[280px]',
     none: 'h-0'
@@ -16,7 +17,7 @@ const Line = ({ length }: { length: BarLength }) => {
   );
 };
 
-type BarLength = 'standard' | 'short' | 'long' | 'none';
+type BarLength = 'standard' | 'short' | 'long' | 'extra-short' | 'none';
 
 export type SectionDividerProps = {
   /** Style of top divider to use */

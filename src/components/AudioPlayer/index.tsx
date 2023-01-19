@@ -6,7 +6,7 @@ import { HTMLProps, useCallback, useEffect, useState } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useMeasure } from 'react-use';
 import shallow from 'zustand/shallow';
-import { AlbumCover } from '../AlbumCover';
+import { Img } from '../Img';
 
 export type AudioPlayerProps = {
   /** How the player should be displayed */
@@ -222,7 +222,16 @@ export function AudioPlayer({
         )}
         {displayMode === 'full' && (
           <div className="flex-shrink-0 w-12 h-12">
-            <AlbumCover song={song!} />
+            <Img
+              src={song?.cover}
+              responsive={!!song?.cover}
+              alt={song?.artist || 'Album cover'}
+              title={song?.attribution || ''}
+              sizes="48px"
+              width={128}
+              height={128}
+              className="object-cover w-full h-full"
+            />
           </div>
         )}
       </div>

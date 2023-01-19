@@ -6,6 +6,7 @@ import { YEAR_HEIGHT } from '$src/lib/consts';
 import { useMemo, useState } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import { computeCanvasSize, computeStats } from './compute';
+import ViewName from './ViewName';
 
 export type Props = {
   data: any;
@@ -39,6 +40,7 @@ const DesktopView = ({ data }: Props) => {
           data={data}
         />
       </div>
+      <ViewName stats={stats} width={width} />
       <FilterBar stats={stats} minYear={minYear} maxYear={maxYear} />
       <Zoom yearHeight={yearHeight} setYearHeight={setYearHeight} />
     </>

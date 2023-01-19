@@ -4,6 +4,7 @@ import { useClickAway } from 'react-use';
 import FilterItems from './FilterItems';
 import MenuItems from './MenuItems';
 import YearRange from './YearRange';
+import LinkToggle from './linkToggle';
 
 export type FilterProps = {
   stats: any;
@@ -32,10 +33,10 @@ export default function Filter({ stats, minYear, maxYear }: FilterProps) {
   return (
     <div
       ref={menuRef}
-      className="filter-bar text-sm fixed bottom-10 right-[var(--page-gutter)] text-right"
+      className="filter-bar text-sm absolute top-7 right-[var(--page-gutter)] text-right"
     >
       {menuVisible && (
-        <div className="absolute right-0 w-56 my-2 text-left bg-white rounded-md shadow-md bottom-full">
+        <div className="absolute right-0 my-2 text-left bg-white rounded-md shadow-md w-60 top-full">
           {mainMenu && (
             <button
               className="block w-full px-4 py-2 font-bold text-left text-gray-500 transition-colors text-md hover:bg-grey-300 hover:text-grey-900"
@@ -46,6 +47,7 @@ export default function Filter({ stats, minYear, maxYear }: FilterProps) {
               Back
             </button>
           )}
+          {!mainMenu && <LinkToggle />}
           <div
             className="py-1 overflow-y-auto max-h-96"
             role="menu"
@@ -70,7 +72,7 @@ export default function Filter({ stats, minYear, maxYear }: FilterProps) {
         onClick={toggleMenus}
         onKeyDown={onKeyAction(toggleMenus)}
       >
-        {menuVisible ? `Close` : `Add Filter`}
+        {menuVisible ? `Close` : `Filters`}
       </button>
     </div>
   );

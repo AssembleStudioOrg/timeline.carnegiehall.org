@@ -2,6 +2,7 @@ import create from 'zustand';
 
 type Exploration = {
   title: string;
+  type: string;
   href: string;
 };
 
@@ -15,7 +16,7 @@ export const useExplorations = create<UseExplorations>((set) => ({
   add: (exploration) =>
     set(({ explorations }) => {
       const newExplorations = explorations.filter(
-        ({ href }) => href.split('?')[0] !== exploration.href.split('?')[0]
+        ({ href }) => href !== exploration.href
       );
 
       return { explorations: [exploration, ...newExplorations] };

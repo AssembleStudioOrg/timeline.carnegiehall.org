@@ -15,24 +15,24 @@ export type VideoProps = {
 export function Video({ src, thumbnail, className = '' }: VideoProps) {
   return (
     <div
-      className={`aspect-w-16 aspect-h-9 ${className}`}
+      className={`${className}`}
       style={{
+        aspectRatio: '16/9',
+        height: '100%',
         backgroundImage: `url(${thumbnail})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center'
       }}
     >
       <ReactPlayer
-        className="absolute top-0 left-0"
         url={src}
         light={thumbnail}
         playing={!!thumbnail}
-        preload
         controls
         width="100%"
         height="100%"
         playIcon={
-          <div className="w-20 h-20 flex items-center justify-center rounded-full border-2 text-white">
+          <div className="flex items-center justify-center w-20 h-20 text-white border-2 rounded-full">
             <PlayIcon className="fill-current h-9 w-9" />
           </div>
         }

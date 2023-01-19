@@ -34,6 +34,10 @@
     /* content-visibility: auto; */
   }
 
+  .anchor {
+    @apply relative inline break-all transition-colors border-b hover:text-red border-red;
+  }
+
   .richtext {
     word-break: break-word;
     & ol,
@@ -52,6 +56,19 @@
     & blockquote {
       @apply pl-12;
     }
+    & a {
+      @apply anchor;
+    }
+  }
+
+  .inline-richtext {
+    @apply richtext;
+    & p:first-child {
+      margin-top: 0;
+    }
+    & p:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .subgrid {
@@ -59,8 +76,5 @@
   }
   .label {
     @apply tracking-[1.25px] uppercase font-ui md:tracking-tracked;
-  }
-  .anchor {
-    @apply relative inline break-all transition-colors border-b hover:text-red border-red;
   }
 }

@@ -5,14 +5,14 @@ Frontend of the music timeline for Carngie Hall's history of African American mu
 ## Local development
 
 - Clone this repository
-- Install dependencies with `npm`
-- Run `npm dev` to start up local development server on `localhost:3000`
-- Work on the design system with `npm run storybook`, on `localhost:3002`
-- Build locally with `npm run build`
+- Install dependencies with `pnpm`
+- Run `pnpm dev` to start up local development server on `localhost:3000`
+- Work on the design system with `pnpm run storybook`, on `localhost:3002`
+- Build locally with `pnpm turbo build`
 
 ## Built with
 
-- NextJS 11 / React 17 / Webpack 5
+- NextJS 13 / React 18
 - Typescript
 - Tailwind CSS
 - [Storybook](https://storybook.js.org/) for design system documentation

@@ -6,10 +6,10 @@ import { onKeyAction } from '$src/lib/utils';
 import { useLayout } from '$src/stores/useLayout';
 import { useRouter } from 'next/dist/client/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { HamburgerIcon } from 'react-hamburger-icon';
 import _Headroom from 'react-headroom';
 import { useKeyPressEvent } from 'react-use';
 import shallow from 'zustand/shallow';
+import { HamburgerIcon } from './Hamburger';
 import { Link } from './Link';
 import { NavBar } from './NavBar';
 import { PageGrid } from './PageGrid';
@@ -114,7 +114,7 @@ export function Header() {
         `}
             style={{ transition: 'color' }}
           >
-            <div className="relative z-10 flex items-center justify-between col-span-1 col-start-2 py-4">
+            <div className="relative z-10 flex items-center justify-between col-span-1 col-start-2 h-13 md:h-[72px]">
               <Link className="hidden lg:block" href="/" aria-label="Home">
                 <Logo className="w-10 h-10 logo" />
               </Link>

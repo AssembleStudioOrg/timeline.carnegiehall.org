@@ -40,6 +40,8 @@ const MobileView = ({ data }: Props) => {
     trackMouse: true
   });
 
+  const view = (views as any)[viewCursor];
+
   return (
     <>
       <Years
@@ -67,9 +69,12 @@ const MobileView = ({ data }: Props) => {
           />
         </div>
       </div>
-      <div className="fixed flex items-center w-11/12 px-4 py-2 text-center text-white rounded-md px bottom-10 bg-black-300 shadow-card">
+      <div
+        className="fixed flex items-center w-11/12 px-4 py-2 text-center text-white rounded-md px bottom-10 shadow-card"
+        style={{ backgroundColor: stats.colors.get(view) }}
+      >
         <LeftButton onClick={() => slideRight()} />
-        <span className="w-full font-bold">{(views as any)[viewCursor]}</span>
+        <span className="w-full font-bold">{view}</span>
         <RightButton onClick={() => slideLeft()} />
       </div>
     </>

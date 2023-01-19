@@ -27,7 +27,7 @@ const isFilterOut = (node: Node) => (node._filterOut ? 0.2 : 1);
 
 const STORE_SLICES = {
   updateLayout: (s: any) => s.update,
-  filters: (s: any) => s.filters
+  filters: (s: any) => [s.filters, s.showCrossLinks]
 };
 
 /**
@@ -46,7 +46,7 @@ export default function Sankey({
   const [hoveredNodes, setHoveredNodes] = useState(new Set());
   const [highlightedNodes, setHighlightedNodes] = useState(new Set());
   const updateLayout = useLayout(STORE_SLICES.updateLayout);
-  const filters = useTimeline(STORE_SLICES.filters);
+  const [filters, showCrossLinks] = useTimeline(STORE_SLICES.filters);
 
   useEffect(() => {
     updateLayout({
@@ -74,7 +74,8 @@ export default function Sankey({
     width,
     height,
     filters,
-    isMobile
+    isMobile,
+    showCrossLinks,
   });
 
   const onNodeHover = (node: Node) => () => {
@@ -188,39 +189,43 @@ export default function Sankey({
             </g>
           ))}
         </g>
-        <g className="cross-links">
-          {links
-            .filter((l) => isCrossLink(l))
-            .map((l, i) => (
-              <g className="cross-link" key={i}>
-                <path
-                  d={l.d}
-                  fill="none"
-                  stroke="rgba(0, 0, 0, 0.4)"
-                  strokeDasharray={STROKE_DASH_ARRAY}
-                  opacity={
-                    hoveredNodes.size
-                      ? hoveredNodes.has(l.source) || hoveredNodes.has(l.target)
-                        ? 1
-                        : 0.05
-                      : 1
-                  }
-                />
-                <polygon
-                  points={l.triangle}
-                  opacity={
-                    hoveredNodes.size
-                      ? hoveredNodes.has(l.source) || hoveredNodes.has(l.target)
-                        ? 1
-                        : 0.05
-                      : 1
-                  }
-                  // transform={`rotate(${l.rotate},
-                  //   ${l.targetNode._xMidPoint}, ${l.targetNode._yMidPoint})`}
-                ></polygon>
-              </g>
-            ))}
-        </g>
+        {showCrossLinks ? (
+          <g className="cross-links">
+            {links
+              .filter((l) => isCrossLink(l))
+              .map((l, i) => (
+                <g className="cross-link" key={i}>
+                  <path
+                    d={l.d}
+                    fill="none"
+                    stroke="rgba(0, 0, 0, 0.4)"
+                    strokeDasharray={STROKE_DASH_ARRAY}
+                    opacity={
+                      hoveredNodes.size
+                        ? hoveredNodes.has(l.source) ||
+                          hoveredNodes.has(l.target)
+                          ? 1
+                          : 0.05
+                        : 1
+                    }
+                  />
+                  <polygon
+                    points={l.triangle}
+                    opacity={
+                      hoveredNodes.size
+                        ? hoveredNodes.has(l.source) ||
+                          hoveredNodes.has(l.target)
+                          ? 1
+                          : 0.05
+                        : 1
+                    }
+                    // transform={`rotate(${l.rotate},
+                    //   ${l.targetNode._xMidPoint}, ${l.targetNode._yMidPoint})`}
+                  ></polygon>
+                </g>
+              ))}
+          </g>
+        ) : null}
       </svg>
     </div>
   );

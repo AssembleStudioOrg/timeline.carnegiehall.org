@@ -23,16 +23,24 @@ export type SongConfig = {
  * @param song Song data from CMS
  */
 export function parseSong(song: any): SongConfig {
+  const type = song.apple_music_song_id ? 'apple' : 'local';
   return {
     source: {
-      type: song.apple_music_song_id ? 'apple' : 'local',
+      type,
       appleId: song.apple_music_song_id
     },
-    audio: song.song_file,
+    audio: song.song_file || song.apple_music_attributes?.preview_song_url,
     title: song.title,
-    artist: song.artist?.name,
+    artist: song.artist?.name || song.apple_music_attributes?.artist_name,
     attribution: song.artist?.attribution,
-    cover: /^(data:image)/.test(song.artist?.image) ? null : song.artist?.image
+    cover:
+      type === 'apple'
+        ? song.apple_music_attributes?.artwork?.url
+            .replace('{w}', 128)
+            .replace('{h}', 128)
+        : /^(data:image)/.test(song.artist?.image)
+        ? null
+        : song.artist?.image
   };
 }
 

@@ -2,9 +2,9 @@ const plugin = require('tailwindcss/plugin');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
-  purge: ['./**/*.tsx'],
+  content: ['./**/*.tsx'],
   mode: 'jit',
-  darkMode: false,
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {

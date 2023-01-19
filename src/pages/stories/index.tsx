@@ -4,23 +4,22 @@ import { Meta } from '$src/components/Meta';
 import { NavBar } from '$src/components/NavBar';
 import { NumberLabel } from '$src/components/NumberLabel';
 import { PageGrid } from '$src/components/PageGrid';
-import { ScrollProgress } from '$src/components/ScrollProgress';
-import { CMS_API } from '$src/lib/consts';
-import { fetchJSON, paginatedFetchJSON } from '$src/lib/utils';
-import { useLayout, usePageLayout } from '$src/stores/useLayout';
+import { cms } from '$src/lib/cms';
+import { GlobalData } from '$src/lib/GlobalData';
+import { usePageLayout } from '$src/stores/useLayout';
 import type { Author } from '$types/data';
 import Color from 'color';
 import type { GetStaticProps } from 'next';
 import { useRouter } from 'next/dist/client/router';
 import Head from 'next/head';
-import { useCallback, useEffect, useState } from 'react';
-import shallow from 'zustand/shallow';
+import { useContext, useState } from 'react';
 
 /**
  * Stories page
  */
 export default function StoriesPage({ heading, stories }: any) {
   const router = useRouter(),
+    { settings } = useContext(GlobalData),
     sortedStories = stories.sort((a: any, b: any) => a.position - b.position),
     [activeStory, setActiveStory] = useState<number>(),
     hasActive = typeof activeStory !== 'undefined';
@@ -42,7 +41,11 @@ export default function StoriesPage({ heading, stories }: any) {
 
   return (
     <>
-      <Meta title={heading} />
+      <Meta
+        title={settings.seo_stories_title}
+        description={settings.seo_stories_description}
+        image={settings.seo_stories_image}
+      />
       <PageGrid
         className="transform translate-y-7"
         style={{ marginBottom: '-2rem' }}
@@ -117,32 +120,16 @@ export default function StoriesPage({ heading, stories }: any) {
 }
 
 /** Page data */
-export const getStaticProps: GetStaticProps = async () => {
-  const settings = await fetchJSON(`${CMS_API}/site-settings`),
-    { data: stories } = await paginatedFetchJSON(`${CMS_API}/stories`);
+export const getStaticProps: GetStaticProps = async ({ preview }) => {
+  const [settings, stories] = await Promise.all([
+    cms(`site-settings`),
+    cms(`v2/stories`, { preview })
+  ]);
 
   return {
     props: {
       heading: settings.stories_index_heading,
-      stories: stories.map(
-        ({
-          slug,
-          position,
-          title,
-          hero_image,
-          color,
-          authors,
-          default_song
-        }: any) => ({
-          slug,
-          default_song,
-          position,
-          title,
-          hero_image,
-          color,
-          authors
-        })
-      )
+      stories: stories.data
     }
   };
 };

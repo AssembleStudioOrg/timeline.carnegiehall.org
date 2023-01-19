@@ -1,7 +1,7 @@
 import { plaintext } from '$src/lib/utils';
 import type { HTMLProps } from 'react';
 import { useEffect, useState } from 'react';
-import { useScrollPercentage } from 'react-scroll-percentage';
+import { useScrollPercentage } from 'react-scroll-percentage/dist/';
 import { Img } from '../Img';
 import { MediaDetails } from '../MediaDetails';
 import { PageGrid } from '../PageGrid';

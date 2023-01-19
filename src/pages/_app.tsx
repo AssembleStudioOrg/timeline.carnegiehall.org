@@ -2,16 +2,14 @@ import { GlobalPlayer } from '$src/components/AudioPlayer/lib/GlobalPlayer';
 import { Footer } from '$src/components/Footer';
 import { Header } from '$src/components/Header';
 import { PageGrid } from '$src/components/PageGrid';
-import { CMS_API, MUSICKIT_SCRIPT, SITE_URL } from '$src/lib/consts';
+import { cms } from '$src/lib/cms';
+import { MUSICKIT_SCRIPT, SITE_URL } from '$src/lib/consts';
 import { GlobalData } from '$src/lib/GlobalData';
-import { fetchJSON, paginatedFetchJSON } from '$src/lib/utils';
-import { useExplorations } from '$src/stores/useExplorations';
 import { useLayout } from '$src/stores/useLayout';
 import '$src/styles/index.css';
 import { DefaultSeo } from 'next-seo';
 import type { AppContext, AppProps } from 'next/app';
 import NextApp from 'next/app';
-import { useRouter } from 'next/dist/client/router';
 import Head from 'next/head';
 import { useCallback, useEffect, useState } from 'react';
 import GTM from 'react-gtm-module';
@@ -21,15 +19,13 @@ function App({
   Component,
   pageProps,
   footer,
-  about,
   stories,
-  authors,
   genres,
-  settings
+  performers,
+  settings,
+  menu
 }: AppProps & any) {
-  const router = useRouter(),
-    [ready, setReady] = useState(false),
-    addExploration = useExplorations(useCallback((s) => s.add, [])),
+  const [ready, setReady] = useState(false),
     page = useLayout(useCallback((s) => s.page, []));
 
   useEffect(() => {
@@ -40,16 +36,6 @@ function App({
     });
   }, []);
 
-  useEffect(() => {
-    const add = (href: string) =>
-      addExploration({ title: document.title, href });
-
-    router.events.on('routeChangeComplete', add);
-    return () => {
-      router.events.off('routeChangeComplete', add);
-    };
-  }, [router.events, addExploration]);
-
   return (
     <>
       <Head>
@@ -57,7 +43,7 @@ function App({
         <link rel="shortcut icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/manifest.webmanifest" />
-        <meta name="theme-color" content="#" />
+        <meta name="theme-color" content="#16140e" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icon.png" />
 
         {/* Fonts */}
@@ -80,7 +66,14 @@ function App({
 
       {/* Page */}
       <GlobalData.Provider
-        value={{ footer, about, stories, genres, settings, authors }}
+        value={{
+          footer,
+          stories,
+          genres,
+          settings,
+          menu,
+          performers
+        }}
       >
         <div
           className="grid grid-cols-[var(--grid-page)] auto-rows-min min-h-screen"
@@ -105,22 +98,30 @@ function App({
 // Should be getStaticProps, but not supported in _app yet
 // See https://github.com/vercel/next.js/discussions/10949
 App.getInitialProps = async (appContext: AppContext) => {
-  const { data: stories } = await paginatedFetchJSON(`${CMS_API}/stories`),
-    { data: genres } = await paginatedFetchJSON(`${CMS_API}/genres`);
+  const [stories, genres, performers, footer, settings, menu] =
+    await Promise.all([
+      cms(`v2/stories`),
+      cms(`v2/genres`),
+      cms('v2/notable-performers'),
+      cms('footer'),
+      cms('site-settings'),
+      cms('v2/menus/1')
+    ]);
 
   return {
     ...(await NextApp.getInitialProps(appContext)),
-    footer: await fetchJSON(`${CMS_API}/footer`),
-    settings: await fetchJSON(`${CMS_API}/site-settings`),
-    about: await fetchJSON(`${CMS_API}/about-page`),
-    authors: await fetchJSON(`${CMS_API}/authors`),
-    stories: stories.map(({ id, slug, position, title }: any) => ({
+    stories: stories.data,
+    genres: genres.data,
+    // TODO: Remove once endpoint cleaned up
+    performers: performers.map(({ id, slug, name, show_in_menu }: any) => ({
       id,
       slug,
-      position,
-      title
+      name,
+      show_in_menu
     })),
-    genres: genres.map(({ id, slug, name }: any) => ({ id, slug, name }))
+    footer,
+    settings,
+    menu
   };
 };
 

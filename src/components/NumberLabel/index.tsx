@@ -33,8 +33,8 @@ export function NumberLabel({
       `}
     >
       <span
-        className={`block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-ui tracking-tighter text-sm ${
-          !small && 'sm:text-base font-bold'
+        className={`block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-ui tracking-tighter text-xs sm:text-sm ${
+          !small && 'sm:text-base sm:font-bold'
         }`}
       >
         {number}

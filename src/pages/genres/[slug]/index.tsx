@@ -2,6 +2,7 @@ import { AuthorCredit } from '$src/components/AuthorCredit';
 import { Button } from '$src/components/Button';
 import { Img } from '$src/components/Img';
 import { InfluenceList } from '$src/components/InfluenceList';
+import { Link } from '$src/components/Link';
 import { MediaDetails } from '$src/components/MediaDetails';
 import { Meta } from '$src/components/Meta';
 import { OverflowScroll } from '$src/components/OverflowScroll';
@@ -13,9 +14,10 @@ import { ShareBar } from '$src/components/ShareBar';
 import { Song } from '$src/components/Song';
 import { SwipeCarousel } from '$src/components/SwipeCarousel';
 import { Article, ARTICLE_SECTION_LAYOUT } from '$src/containers/Article';
-import { BREAKPOINTS, CMS_API } from '$src/lib/consts';
+import { cms } from '$src/lib/cms';
+import { BREAKPOINTS } from '$src/lib/consts';
 import { useBreakpoint } from '$src/lib/hooks';
-import { fetchJSON, paginatedFetchJSON } from '$src/lib/utils';
+import { useExplorations } from '$src/stores/useExplorations';
 import { usePageLayout } from '$src/stores/useLayout';
 import { usePlayer } from '$src/stores/usePlayer';
 import { parseSong, useSong } from '$src/stores/useSong';
@@ -23,42 +25,7 @@ import { useTimeline } from '$src/stores/useTimeline';
 import type { Author } from '$types/data';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHoverDirty } from 'react-use';
-
-function Performer({
-  image,
-  name,
-  attribution,
-  onHover
-}: {
-  image: string;
-  name: string;
-  attribution: string;
-  onHover(): void;
-}) {
-  const img = useRef(null),
-    hover = useHoverDirty(img);
-
-  useEffect(() => {
-    hover && onHover();
-  }, [hover, onHover]);
-
-  return (
-    <div ref={img} className="w-[315px]">
-      <Img
-        src={image}
-        title={attribution}
-        className="w-full"
-        width={315}
-        height={315}
-        alt={name}
-        imgixParams={{ fit: 'crop', ar: '1:1' }}
-        sizes="315px"
-      />
-    </div>
-  );
-}
+import { useCallback, useEffect, useState } from 'react';
 
 function FeatureList({
   title,
@@ -70,6 +37,7 @@ function FeatureList({
   type: string;
 }) {
   const router = useRouter(),
+    isDesktop = useBreakpoint('(min-width: 540px)'),
     setFilters = useTimeline(useCallback((s) => s.setFilters, []));
 
   function viewFeature(title: any) {
@@ -82,13 +50,13 @@ function FeatureList({
   return (
     <div className="text-center md:h-full md:text-left md:flex-1 md:flex md:flex-col md:items-center md:border-r last:border-r-0 md:py-6">
       <div>
-        <h2 className="text-lg font-bold font-display">{title}</h2>
+        <h2 className="font-bold font-ui">{title}</h2>
         <ul className="pt-4 text-sm md:text-xsm label pb-7">
           {items.map(({ title, id }) => (
             <li className="my-2" key={id}>
               <span
-                onClick={() => viewFeature(title)}
-                className="transition-colors cursor-pointer hover:text-red"
+                onClick={() => isDesktop && viewFeature(title)}
+                className="transition-colors cursor-pointer pointer-events-none hover:text-red sm:pointer-events-auto"
               >
                 {title}
               </span>
@@ -107,7 +75,8 @@ export default function GenrePage({ data }: any) {
   const setSong = useSong(useCallback((s) => s.set, [])),
     songPlaying = usePlayer(useCallback((s) => s.playing, [])),
     isDesktop = useBreakpoint(`(min-width: ${BREAKPOINTS.md})`),
-    [performer, setPerformer] = useState(0),
+    router = useRouter(),
+    addExploration = useExplorations((s) => s.add),
     bibliography = data.content.find(
       ({ type }: any) => type === 'bibliography-collection'
     ),
@@ -136,7 +105,12 @@ export default function GenrePage({ data }: any) {
     if (data.default_song && !songPlaying) {
       setSong(parseSong(data.default_song));
     }
-  }, [setSong, data]);
+    addExploration({
+      title: data.name,
+      href: router.asPath,
+      type: 'Genre'
+    });
+  }, [setSong, data, addExploration, router]);
 
   usePageLayout(
     {
@@ -179,11 +153,7 @@ export default function GenrePage({ data }: any) {
         }
       `}</style>
 
-      <Meta
-        title={data.seo.title}
-        description={data.seo.description}
-        cover={data.seo.image}
-      />
+      <Meta {...data.seo} />
 
       <ScrollProgress />
 
@@ -279,6 +249,12 @@ export default function GenrePage({ data }: any) {
         )}
 
         <PageGrid as="section" className="pt-12 features pb-7 md:py-16">
+          <div className="mb-10 text-center">
+            <h1 className="text-lg font-bold font-display">
+              Key Attributes of {data.name}
+            </h1>
+            {isDesktop && <span>Select to filter timeline</span>}
+          </div>
           {isDesktop ? (
             <div className="flex items-center">{featureLists}</div>
           ) : (
@@ -290,22 +266,34 @@ export default function GenrePage({ data }: any) {
 
         <SectionDivider className="subgrid ">
           <div className="w-full text-white bg-black">
-            <OverflowScroll fullwidth>
+            <OverflowScroll fullwidth withNav navOffset={-90}>
               {data.notable_performers.map(
-                ({ image, name, attribution }: any, i: number) => (
-                  <Performer
-                    image={image}
-                    name={name}
-                    attribution={attribution}
-                    onHover={() => setPerformer(i)}
+                ({ image, name, slug, attribution }: any, i: number) => (
+                  <Link
+                    href={`/performers/${slug}`}
+                    className="w-[315px]"
                     key={i}
-                  />
+                  >
+                    <div className="overflow-hidden group">
+                      <Img
+                        src={image}
+                        title={attribution}
+                        className="w-full transition-transform group-hover:scale-110"
+                        style={{ transformOrigin: 'center' }}
+                        width={315}
+                        height={315}
+                        alt={name}
+                        imgixParams={{ fit: 'crop', ar: '1:1' }}
+                        sizes="315px"
+                      />
+                    </div>
+                    <div className="text-sm leading-5 text-center label py-9">
+                      {name}
+                    </div>
+                  </Link>
                 )
               )}
             </OverflowScroll>
-            <div className="text-sm leading-5 text-center col-span-full label py-9">
-              {data.notable_performers[performer]?.name}
-            </div>
           </div>
         </SectionDivider>
         <div className="max-w-4xl mx-auto">
@@ -332,8 +320,8 @@ export default function GenrePage({ data }: any) {
 }
 
 /** Page data */
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const data = await fetchJSON(`${CMS_API}/genres/${params?.slug}`);
+export const getStaticProps: GetStaticProps = async ({ params, preview }) => {
+  const data = await cms(`v2/genres/${params?.slug}`, { preview });
 
   if (!data) {
     return {
@@ -348,7 +336,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
 /** Static pages generation */
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: genres } = await paginatedFetchJSON(`${CMS_API}/genres`);
+  const { data: genres } = await cms(`v2/genres`);
 
   return {
     paths: genres.map(({ slug }: any) => ({ params: { slug } })),
