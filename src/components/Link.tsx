@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import NextLink, { LinkProps } from 'next/link';
 import { resolveUrl } from '$src/lib/utils';
-import { SITE_URL } from '$src/lib/consts';
 
 /**
  * Link wrapper
@@ -11,7 +10,8 @@ export function Link({ href = '', children, ...props }: LinkProps & any) {
 
   useEffect(() => {
     setExternal(
-      new URL(resolveUrl(href, SITE_URL!)).origin !== location.origin
+      new URL(resolveUrl(href, process.env.NEXT_PUBLIC_SITE_URL!)).origin !==
+        location.origin
     );
   }, [href]);
 

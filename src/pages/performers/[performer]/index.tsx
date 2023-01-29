@@ -70,7 +70,7 @@ export default function PerformerPage({ data, missing }: any) {
           direction="down"
           period={{
             start: '1600',
-            end: '2020'
+            end: 'Present'
           }}
         />
       )}
@@ -197,10 +197,11 @@ export default function PerformerPage({ data, missing }: any) {
               media={
                 [
                   {
-                    media: encodeURI(wikidata?.image),
+                    media: wikidata.image,
                     type: 'image',
                     caption: data.name,
-                    credit: ''
+                    credit: '',
+                    srcset: false
                   }
                 ] as any
               }

@@ -1,5 +1,6 @@
 import wdk from 'wikidata-sdk';
 import { httpfetch } from './utils';
+import encodeurl from 'encodeurl';
 
 export async function wikidata(CHID: string) {
   const url = wdk.sparqlQuery(`
@@ -44,7 +45,10 @@ export async function wikidata(CHID: string) {
       url: wdk.getSitelinkUrl('enwiki', sitelinks.enwiki) || '',
       summary: (Object.values(wikipedia.pages)[0] as any).extract || ''
     },
-    image: (claims.P18 && wdk.getImageUrl(claims.P18[0])) || '',
+    image:
+      (claims.P18 && encodeurl(wdk.getImageUrl(claims.P18[0])))
+        .replace(/[!',()*]/g, (c: string) => '%' + c.charCodeAt(0).toString(16))
+        .replaceAll('%20', '_') || '',
     website: (claims.P856 && claims.P856[0]) || '',
     appleMusic: claims.P2850
       ? `https://music.apple.com/artist/${claims.P2850[0]}`

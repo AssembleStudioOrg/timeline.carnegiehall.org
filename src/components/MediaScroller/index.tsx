@@ -17,6 +17,7 @@ type MediaItemProps = {
   creditLink?: string;
   url?: string;
   disabled?: boolean;
+  srcset?: boolean;
 };
 
 const MediaItem = ({
@@ -26,13 +27,15 @@ const MediaItem = ({
   creditLink,
   disabled,
   alt,
+  srcset = true,
   onVisible,
   ...props
 }: { onVisible(): void } & Partial<MediaItemProps> &
   HTMLProps<HTMLDivElement>) => {
   const [ref, percentage] = useScrollPercentage(),
     [ready, setReady] = useState(false),
-    [visible, setVisible] = useState(false);
+    [visible, setVisible] = useState(false),
+    ImgElement = srcset ? Img : 'img';
 
   useEffect(() => {
     setTimeout(() => window.dispatchEvent(new CustomEvent('scroll')), 0);
@@ -67,7 +70,7 @@ const MediaItem = ({
             }
           >
             {type === 'image' ? (
-              <Img
+              <ImgElement
                 src={media!}
                 alt={alt || ''}
                 className="mx-auto max-w-[100%] max-h-[80vh]"

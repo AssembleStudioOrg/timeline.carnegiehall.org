@@ -1,7 +1,6 @@
 import { NextSeo } from 'next-seo';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { SITE_URL } from '../lib/consts';
 import { resolveUrl } from '../lib/utils';
 
 export type MetaProps = {
@@ -22,8 +21,6 @@ export function Meta({ title, description, image, keywords }: MetaProps) {
   const { pathname, locale, defaultLocale, query } = useRouter();
   let resolvedPathName = pathname;
 
-  console.log(keywords);
-
   Object.keys(query).map(
     (key) =>
       (resolvedPathName = resolvedPathName.replace(
@@ -32,11 +29,13 @@ export function Meta({ title, description, image, keywords }: MetaProps) {
       ))
   );
 
-  const resolvedCover = image && (resolveUrl(image, SITE_URL || '') as string),
+  const resolvedCover =
+      image &&
+      (resolveUrl(image, process.env.NEXT_PUBLIC_SITE_URL || '') as string),
     resolvedLocation =
       locale === defaultLocale
-        ? `${SITE_URL}${resolvedPathName}`
-        : `${SITE_URL}/${locale}${resolvedPathName}`;
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}${resolvedPathName}`
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}${resolvedPathName}`;
 
   return (
     <>

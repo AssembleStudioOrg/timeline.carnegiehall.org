@@ -24,7 +24,7 @@ export default function StaticPage({ data }: any) {
         direction="down"
         period={{
           start: '1600',
-          end: '2020'
+          end: 'Present'
         }}
       />
 

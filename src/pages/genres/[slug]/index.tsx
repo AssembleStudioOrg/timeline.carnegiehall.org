@@ -271,7 +271,7 @@ export default function GenrePage({ data }: any) {
                 ({ image, name, slug, attribution }: any, i: number) => (
                   <Link
                     href={`/performers/${slug}`}
-                    className="w-[315px]"
+                    className="block w-[315px]"
                     key={i}
                   >
                     <div className="overflow-hidden group">

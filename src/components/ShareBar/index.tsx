@@ -1,4 +1,3 @@
-import { SITE_URL } from '$src/lib/consts';
 import { onKeyAction } from '$src/lib/utils';
 import { useRouter } from 'next/dist/client/router';
 import { HTMLProps, useState } from 'react';
@@ -40,7 +39,7 @@ export function ShareBar({ citation, className = '' }: ShareBarProps) {
             <span>Share on &nbsp;</span>
             <FacebookShareButton
               className={link}
-              url={`${SITE_URL}${router?.asPath}`}
+              url={`${process.env.NEXT_PUBLIC_SITE_URL}${router?.asPath}`}
               quote={citation}
             >
               Facebook
@@ -48,7 +47,7 @@ export function ShareBar({ citation, className = '' }: ShareBarProps) {
             <span className="inline-block mr-2">,</span>
             <TwitterShareButton
               className={link}
-              url={`${SITE_URL}${router?.asPath}`}
+              url={`${process.env.NEXT_PUBLIC_SITE_URL}${router?.asPath}`}
               title={citation}
             >
               Twitter

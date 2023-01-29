@@ -3,7 +3,7 @@ import { Footer } from '$src/components/Footer';
 import { Header } from '$src/components/Header';
 import { PageGrid } from '$src/components/PageGrid';
 import { cms } from '$src/lib/cms';
-import { MUSICKIT_SCRIPT, SITE_URL } from '$src/lib/consts';
+import { MUSICKIT_SCRIPT } from '$src/lib/consts';
 import { GlobalData } from '$src/lib/GlobalData';
 import { useLayout } from '$src/stores/useLayout';
 import '$src/styles/index.css';
@@ -59,7 +59,7 @@ function App({
         openGraph={{
           type: 'website',
           locale: 'en',
-          url: SITE_URL,
+          url: process.env.NEXT_PUBLIC_SITE_URL,
           site_name: settings.site_name
         }}
       />
